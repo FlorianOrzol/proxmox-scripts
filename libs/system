@@ -21,11 +21,17 @@ UPDATE_NAME="$(date +%Y-%m-%d)proxmox-before-update"
 FILE_NO_SUBSCRIPTION="/etc/apt/apt.conf.d/pve-no-subscription-message" 
 
 
+
+
+
 # show available snapshots only for rpool
 function show_snapshots() {
 	information "Available snapshots:"
 	command "zfs list -t snapshot -r $ZFS_ROOT_POOL"
 }
+
+
+
 
 
 
@@ -40,6 +46,14 @@ function cleanup_snapshots() {
 	information "Delete all snapshots except the last 3"
 	command "zfs list -t snapshot -r $ZFS_ROOT_POOL | tail -n +4 | awk '{print \$1}' | xargs -n 1 zfs destroy"
 }
+
+
+
+
+
+
+
+
 
 
 function create_snapshot() {
@@ -63,11 +77,22 @@ function create_snapshot() {
 
 
 
+
+
+
+
+
 function update_proxmox() {
 	# update Proxmox VE
 	section "Update Proxmox VE"
 	command "apt update && apt dist-upgrade -y"
 }
+
+
+
+
+
+
 
 
 function check_today() {
@@ -78,6 +103,15 @@ function check_today() {
 		exit
 	fi
 }
+
+
+
+
+
+
+
+
+
 
 function delete_snapshot() {
 	# delete the snapshot
@@ -101,6 +135,15 @@ function delete_snapshot() {
 	command "zfs destroy $beforeLastUpdate"
 }
 
+
+
+
+
+
+
+
+
+
 function rollback_last_update() {
 	# check if the update was already done today
 	section "Rollback to the snapshot"
@@ -116,12 +159,28 @@ function rollback_last_update() {
 		fi
 	fi
 
+
+
+
+
+
+
+
+
+
 	beforeLastUpdate=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME | tail -n 1 | awk '{print $1}')
 	# rollback to the last snapshot
 	command "zfs rollback $beforeLastUpdate"
-
-	
 }
+
+
+
+
+
+
+
+
+
 
 function no_enterprise() {
 	section "Change Enterprise to Community Edition"
@@ -152,23 +211,29 @@ function no_enterprise() {
 	# set no-subscription
 	information "Set no-subscription"
 
-	if [ ! -f $FILE_NO_SUBSCRIPTION ]; then
-		information "Set no-subscription for the webinterface"
-		echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription message from UI...'; sed -i -e '/data.status/{s/!//;s/Active/NoMoreSubMessage/i}' -e 's#(-no-subscription|test)#(test)#' -e '/if (repos.nosubscription)/{n;s/addWarn/addGood/}' -e 's/All OK, you have production-ready repositories configured!/All OK, you have no-subscription repositories configured!/' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > $FILE_NO_SUBSCRIPTION
+	#if [ ! -f $FILE_NO_SUBSCRIPTION ]; then
+	#	information "Set no-subscription for the webinterface"
+	#	echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription message from UI...'; sed -i -e '/data.status/{s/!//;s/Active/NoMoreSubMessage/i}' -e 's#(-no-subscription|test)#(test)#' -e '/if (repos.nosubscription)/{n;s/addWarn/addGood/}' -e 's/All OK, you have production-ready repositories configured!/All OK, you have no-subscription repositories configured!/' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > $FILE_NO_SUBSCRIPTION
 
-		command "apt install proxmox-widget-toolkit"
-		command "systemctl restart pveproxy.service"
-	fi
+	#	command "apt install proxmox-widget-toolkit"
+	#	command "systemctl restart pveproxy.service"
+	#else
+	#	information "No-subscription is already set."
+	#fi
 
 	# update the repository
 	information "Update the repository"
 	command "apt update"
-
-
 }
 
 
-	
+
+
+
+
+
+
+
 
 function tasks() {
 	task=$1

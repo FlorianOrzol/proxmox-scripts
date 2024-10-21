@@ -18,6 +18,13 @@
 source support_functions
 source private_data
 
+PN="serma"
+
+if [ ! -f /usr/bin/serma ]; then
+	information "Create symlink to /usr/bin"
+	command "ln -s $(pwd)/$PN.sh /usr/bin/$PN"
+fi
+
 
 
 source libs/$1
