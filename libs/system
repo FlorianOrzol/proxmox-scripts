@@ -18,7 +18,7 @@
 
 ZFS_ROOT_POOL="rpool/ROOT/pve-1"
 UPDATE_NAME="$(date +%Y-%m-%d)proxmox-before-update"
-FILE_NO_SUBSCRIPTION="/usr/share/javascript/proxmox-widget-toolkit/no-subscription.js" 
+FILE_NO_SUBSCRIPTION="/etc/apt/apt.conf.d/pve-no-subscription-message" 
 
 
 # show available snapshots only for rpool
@@ -154,17 +154,10 @@ function no_enterprise() {
 
 	if [ ! -f $FILE_NO_SUBSCRIPTION ]; then
 		information "Set no-subscription for the webinterface"
-		echo "
-Ext.define('Proxmox.node.Dashboard', {
-    override: 'Proxmox.node.Dashboard',
-    initComponent: function() {
-        var me = this;
-        me.callParent();
-        me.mon(Proxmox.Utils, 'authstatechange', me.authChange);
-        me.authChange(Proxmox.Utils.authOK);
-    }
-});" > $FILE_NO_SUBSCRIPTION
-		
+		echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription message from UI...'; sed -i -e '/data.status/{s/!//;s/Active/NoMoreSubMessage/i}' -e 's#(-no-subscription|test)#(test)#' -e '/if (repos.nosubscription)/{n;s/addWarn/addGood/}' -e 's/All OK, you have production-ready repositories configured!/All OK, you have no-subscription repositories configured!/' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > $FILE_NO_SUBSCRIPTION
+
+		command "apt install proxmox-widget-toolkit"
+		command "systemctl restart pveproxy.service"
 	fi
 
 	# update the repository
