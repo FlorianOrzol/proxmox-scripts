@@ -38,6 +38,16 @@ function information {
     waiting 2
 }
 
+function warning {
+	local warning=$1
+
+	set_font_color "reddark"
+	# print the warning
+	echo "$warning"
+	set_font_color "default"
+	waiting 2
+}
+
 function command {
     local command="$1"
 
@@ -229,6 +239,9 @@ function set_font_color {
         lightblue)
             echo -en "\e[94m"
             ;;
+		reddark)
+			echo -en "\e[31m"
+			;;
         default)
             echo -en "\e[0m"
             ;;

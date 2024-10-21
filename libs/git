@@ -23,9 +23,6 @@ if [ -f $GIT_REPO ]; then
 fi
 	
 
-PATH_SCRIPTS="proxmox-scripts"
-PATH_REPO="software-development"
-PATH_SERVER="/root/"
 
 function tasks() {
 	task=$1
@@ -40,7 +37,7 @@ function tasks() {
 				GIT_REPO=$(enter "Please enter git-repo url: ") 
 				command "git ls-remote $GIT_REPO"
 				if [ $? -ne 0 ]; then
-					echo "Please enter a valid git-repo url"
+					warning "Please enter a valid git-repo url"
 				else
 					break
 				fi
@@ -49,29 +46,11 @@ function tasks() {
 			information "Set GIT_REPO in $PATH_PRIVATE_DATA"
 			set_private_data "GIT_REPO" $GIT_REPO
 			;;
-		"init")
-
-			section "Init git repo"
-
-			question_yn "Do you want only a section from repo?" N
-			if [ $? -eq 0 ]; then
-				command "cd $PATH_SERVER"
-				command "git clone --no-checkout $GIT_REPO"
-				command "cd $PATH_REPO"
-				command "git sparse-checkout init --cone"
-				command "git sparse-checkout set $PATH_SCRIPTS"
-				command "git checkout"
-			else
-				command "cd $PATH_SERVER"
-				command "git clone $GIT_REPO"
-			fi
-			# login to git-repo with userdata from private_data
-			;;
 		"update")
 			section "Update scripts from git-repo"
-			command "cd $PATH_SERVER$PATH_REPO"
-			# update scripts with user data from private_data
-			command "git pull $GIT_REPO"
+			# update scripts with user data from private_data file to dirRoot
+			command "cd $dirRoot"
+			command "git pull"
 			;;
 		*)
 			echo "No task found"

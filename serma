@@ -15,17 +15,21 @@
 # \_;( )
 # >>>> START SCRIPT <<<< #
 #
-source support_functions
-source private_data
+#
+
+
+dirRoot=$(dirname $(readlink -f $0))
+source $dirRoot/support_functions
+source $dirRoot/private_data
 
 PN="serma"
 
 if [ ! -f /usr/bin/serma ]; then
 	information "Create symlink to /usr/bin"
-	command "ln -s $(pwd)/$PN.sh /usr/bin/$PN"
+	command "ln -s $dirRoot/$PN.sh /usr/bin/$PN"
 fi
 
 
 
-source libs/$1
+source $dirRoot/libs/$1
 tasks $2

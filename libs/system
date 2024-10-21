@@ -211,16 +211,6 @@ function no_enterprise() {
 	# set no-subscription
 	information "Set no-subscription"
 
-	#if [ ! -f $FILE_NO_SUBSCRIPTION ]; then
-	#	information "Set no-subscription for the webinterface"
-	#	echo "DPkg::Post-Invoke { \"dpkg -V proxmox-widget-toolkit | grep -q '/proxmoxlib\.js$'; if [ $? -eq 1 ]; then { echo 'Removing subscription message from UI...'; sed -i -e '/data.status/{s/!//;s/Active/NoMoreSubMessage/i}' -e 's#(-no-subscription|test)#(test)#' -e '/if (repos.nosubscription)/{n;s/addWarn/addGood/}' -e 's/All OK, you have production-ready repositories configured!/All OK, you have no-subscription repositories configured!/' /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js; }; fi\"; };" > $FILE_NO_SUBSCRIPTION
-
-	#	command "apt install proxmox-widget-toolkit"
-	#	command "systemctl restart pveproxy.service"
-	#else
-	#	information "No-subscription is already set."
-	#fi
-
 	# update the repository
 	information "Update the repository"
 	command "apt update"
