@@ -1,0 +1,239 @@
+#!/bin/bash
+
+
+
+
+function section {
+    local section=$1
+
+    set_font_color "yellow"
+    # print the section name
+    echo "$section"
+    underline "$section" "="
+    set_font_color "default"
+    waiting 2
+}
+
+
+
+function subsection {
+    local subsection=$1
+
+    set_font_color "yellow"
+    # print the subsection name
+    echo "$subsection"
+    set_font_color "default"
+    waiting 2
+
+}
+
+
+function information {
+    local information=$1
+
+    set_font_color "lightgreen"
+    # print the information
+    echo "$information"
+    set_font_color "default"
+    waiting 2
+}
+
+function command {
+    local command="$1"
+
+    set_font_color "lightblue"
+    # print the command
+    echo "-> $command"
+    set_font_color "lightblue"
+    echo -e "----OUTPUT-----------------------------------------"
+    waiting 2
+    set_font_color "default"
+    eval $command
+    set_font_color "lightblue"
+    echo -e "\n---END---------------------------------------------\n"
+    set_font_color "default"
+    waiting 1
+
+}
+
+
+function waiting {
+    waitingtime=$1
+
+
+    set_font_color "darkgrey" 
+    # set brackets for the waiting time, e.g. 5 seconds: [     ]
+    echo -n "waiting ["
+    for i in $(seq 1 $waitingtime); do echo -n " "; done
+    echo -n "]"
+
+    # set the cursor back to the beginning of the line without deleting the brackets [.    ]
+    set_cursor_back $(($waitingtime+1))
+
+    # fill the brackets with a dot every second
+    for i in $(seq 1 $waitingtime); do
+        echo -n "."
+        sleep 1
+    done
+
+    set_font_color "default"
+    delete_line
+
+    
+}
+
+function underline {
+    count=${#1}
+    sign=$2
+    for i in $(seq 1 $count); do echo -n $sign; done
+    echo ""
+}
+
+function question_yn {
+    question=$1
+    default=$2
+
+
+    while true; do
+
+        set_font_color "lightgreen"
+        # if the $default is y or Y
+        if [[ $default == "y" || $default == "Y" ]]; then 
+            echo -n "$question (Y/n)"
+        fi
+
+        # if the $default is n or N
+        if [[ $default == "n" || $default == "N" ]]; then 
+            echo -n "$question (y/N)"
+        fi
+
+        read -r # read the first character
+
+        # if replay is enter
+        if [[ $REPLY == "" ]]; then
+            REPLY=$default
+        fi
+
+        # lowercase the replay
+        REPLY=$(echo $REPLY | tr '[:upper:]' '[:lower:]')
+
+        set_font_color "default"
+
+        # if the replay is y or n
+        if [[ $REPLY == "y" ]]; then
+            return 0
+
+        elif [[ $REPLY == "n" ]]; then
+            return 1
+        fi
+
+        information "Please enter y or n"
+
+    done
+}
+
+function enter {
+    textOrder=$1
+
+    set_font_color "lightgreen"
+
+    echo -e "$textOrder"
+    read -r input1
+
+    set_font_color "default"
+
+    echo $input1
+}
+
+
+function enter_and_confirm {
+    textOrder=$1
+
+    set_font_color "lightgreen"
+
+    while true; do
+        echo -e "$textOrder"
+        read -r input1
+        echo -e "Confirm: (Y/n)"
+        read -r input2
+
+        # if replay is enter
+        if [[ $input2 == "" ]]; then
+            input2="y"
+        fi
+
+        # lowercase the replay
+        input2=$(echo $input2 | tr '[:upper:]' '[:lower:]')
+
+
+        # if the replay is y or n
+        if [[ $input2 == "y" ]]; then
+            break;
+        fi
+        information "Please enter the input again"
+
+    done
+
+    set_font_color "default"
+
+    echo $input1
+
+}
+
+function enter_password {
+    textOrder=$1
+
+    set_font_color "lightgreen"
+
+    while true; do
+        echo -e "$textOrder"
+        read -r -s input1
+        echo -e "Repeat:"
+        read -r -s input2
+
+        if [[ $input1 != $input2 ]]; then
+           information "Passwords do not match, please enter again"
+        else
+            break;
+        fi
+    done
+
+    set_font_color "default"
+
+    echo $input1
+}
+
+
+function set_cursor_back {
+    go_back=$1
+    echo -en "\033[${go_back}D" 
+}
+
+function delete_line {
+    echo -en "\033[2K\n"
+}
+
+function set_font_color {
+    color=$1
+
+    case $color in
+        lightgreen)
+            echo -en "\e[92m"
+            ;;
+        darkgrey)
+            echo -en "\e[90m"
+            ;;
+        yellow)
+            echo -en "\e[93m"
+            ;;
+        lightblue)
+            echo -en "\e[94m"
+            ;;
+        default)
+            echo -en "\e[0m"
+            ;;
+        *)
+            echo -en "\e[0m"
+            ;;
+    esac
+}

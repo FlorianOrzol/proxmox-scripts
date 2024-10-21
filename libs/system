@@ -1,0 +1,183 @@
+#!/bin/bash
+#
+# 
+#  _____        _
+# |~>   |     ('v') 
+# /:::::\    /{w w}\ 
+#--------------------------------
+# Copyright Florian Orzol
+#
+# description: this script updates Proxmox VE
+# date: 2024-10-21
+# version: 1.0 
+#
+#    <')
+# \_;( )
+# >>>> START SCRIPT <<<< #
+#
+
+ZFS_ROOT_POOL="rpool/ROOT/pve-1"
+UPDATE_NAME="$(date +%Y-%m-%d)proxmox-before-update"
+
+
+# show available snapshots only for rpool
+function show_snapshots() {
+	information "Available snapshots:"
+	command "zfs list -t snapshot -r $ZFS_ROOT_POOL"
+}
+
+
+
+function cleanup_snapshots() {
+	section "Cleanup snapshots"
+	# if there are more than 3 snapshots, delete all except the last 3
+	information "Check if there are more than 3 snapshots"
+	if [[ $(zfs list -t snapshot -r $ZFS_ROOT_POOL | wc -l) -le 3 ]]; then
+		information "There are less than 3 snapshots."
+		exit
+	fi
+	information "Delete all snapshots except the last 3"
+	command "zfs list -t snapshot -r $ZFS_ROOT_POOL | tail -n +4 | awk '{print \$1}' | xargs -n 1 zfs destroy"
+}
+
+
+function create_snapshot() {
+	# create a zfs snapshot. named "date(YYYY-MM-DD)-proxmox-update"
+	section "Create a snapshot"
+
+	# check if the snapshot already exists
+	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
+		information "The snapshot $UPDATE_NAME already exists."
+		information "If you want to update Proxmox VE again, delete the snapshot first."
+		question_yn "Do you want to delete the snapshot?" N
+		if [[ $? -eq 0 ]]; then
+			delete_snapshot
+		else
+			exit
+		fi
+	fi
+	command "zfs snapshot $ZFS_ROOT_POOL@$UPDATE_NAME"
+}
+
+
+
+
+function update_proxmox() {
+	# update Proxmox VE
+	section "Update Proxmox VE"
+	command "apt update && apt dist-upgrade -y"
+}
+
+
+function check_today() {
+	# check if the update was already done today
+	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
+		information "The update was already done today."
+		information "If you want to update Proxmox VE again, delete the snapshot first."
+		exit
+	fi
+}
+
+function delete_snapshot() {
+	# delete the snapshot
+	section "Delete the snapshot"
+	# check if the snapshot exists
+	if ! zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
+		information "The last snapshot is not from today."
+		question_yn "Do you realy want to delete the last snapshot?" N
+		if [[ $? -eq 1 ]]; then
+			exit
+		fi
+	else
+		information "You want to delete the last snapshot from today."
+		information "Maybe you want to rollback to the last snapshot instead before delete."
+		question_yn "Do you want to rollback to the last snapshot before delete?" N
+		if [[ $? -eq 0 ]]; then
+			rollback_last_update
+		fi
+	fi
+	beforeLastUpdate=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME | tail -n 1 | awk '{print $1}')
+	command "zfs destroy $beforeLastUpdate"
+}
+
+function rollback_last_update() {
+	# check if the update was already done today
+	section "Rollback to the snapshot"
+	if ! zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
+		information "No update was done today."
+		# show the last update
+		command "zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $ZFS_ROOT_POOL | tail -n 1"
+		information "All steps of the last update will be undone."
+		question_yn "Are you sure you want to rollback to the last update?" N
+		question "Are you sure you want to rollback to the last update?"
+		if [[ $? -eq 1 ]]; then
+			exit
+		fi
+	fi
+
+	beforeLastUpdate=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME | tail -n 1 | awk '{print $1}')
+	# rollback to the last snapshot
+	command "zfs rollback $beforeLastUpdate"
+
+	
+}
+
+function change_enterprise_to_community_edition() {
+	section "Change Enterprise to Community Edition"
+
+	# change Enterpriserepository to Communityrepository
+	information "Change the repository to the community repository"
+	# comment out the enterprise repository
+	if ! grep -q "# deb https://enterprise.proxmox.com/debian/pve bookworm pve-enterprise" /etc/apt/sources.list.d/pve-enterprise.list; then
+		information "Comment out the enterprise repository"
+		command "sed -i \"s|deb https://enterprise.proxmox.com/debian/pve bookworm|# deb https://enterprise.proxmox.com/debian/pve bookworm|g\" /etc/apt/sources.list.d/pve-enterprise.list"
+	fi
+	# add the community repository
+	if ! grep -q "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" /etc/apt/sources.list.d/pve-no-subscription.list; then
+		information "Add the community repository"
+		command "echo \"deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription\" > /etc/apt/sources.list.d/pve-no-subscription.list"
+	fi
+	# comment out the enterprise repository for the Ceph repository
+	if ! grep -q "# deb https://enterprise.proxmox.com/debian/ceph-quincy bookworm" /etc/apt/sources.list.d/ceph.list; then
+		information "Comment out the enterprise repository for ceph"
+		command "sed -i \"s/deb https:\/\/enterprise.proxmox.com\/debian\/ceph-quincy bookworm/\# deb https:\/\/enterprise.proxmox.com\/debian\/ceph-quincy bookworm/g\" /etc/apt/sources.list.d/ceph.list"
+	fi
+	# add the community repository for the Ceph repository
+	if ! grep -q "deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription" /etc/apt/sources.list.d/pve-no-subscription.list; then
+		information "Add the community repository for ceph"
+		command "echo \"deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription\" > /etc/apt/sources.list.d/pve-no-subscription.list"
+	fi
+}
+
+
+	
+
+function tasks() {
+	task=$1
+
+	case $task in
+		"update")
+			create_snapshot
+			update_proxmox
+			cleanup_snapshots
+			show_snapshots
+			;;
+		"rollback")
+			rollback_last_update
+			;;
+		"show-snapshots")
+			show_snapshots
+			;;
+		"delete-snapshot")
+			delete_snapshot
+			;;
+		"replace-enterprise-repo")
+			change_enterprise_to_community_edition
+			;;
+		*)
+			information "available tasks:\n${tasks[@]}"
+			exit
+			;;
+	esac
+}
+

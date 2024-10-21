@@ -1,0 +1,24 @@
+#!/bin/bash
+#
+# 
+#  _____        _
+# |~>   |     ('v') 
+# /:::::\    /{w w}\ 
+#--------------------------------
+# Copyright Florian Orzol
+#
+# description: this script creates a bootable USB stick with Proxmox VE
+# date: 2024-10-18
+# version: 1.0 
+#
+#    <')
+# \_;( )
+# >>>> START SCRIPT <<<< #
+#
+source support_functions
+source private_data
+
+
+
+source libs/$1
+tasks $2
