@@ -18,6 +18,7 @@
 
 ZFS_ROOT_POOL="rpool/ROOT/pve-1"
 UPDATE_NAME="$(date +%Y-%m-%d)proxmox-before-update"
+FILE_NO_SUBSCRIPTION="/usr/share/javascript/proxmox-widget-toolkit/no-subscription.js" 
 
 
 # show available snapshots only for rpool
@@ -122,7 +123,7 @@ function rollback_last_update() {
 	
 }
 
-function change_enterprise_to_community_edition() {
+function no_enterprise() {
 	section "Change Enterprise to Community Edition"
 
 	# change Enterpriserepository to Communityrepository
@@ -148,9 +149,29 @@ function change_enterprise_to_community_edition() {
 		command "echo \"deb http://download.proxmox.com/debian/ceph-quincy bookworm no-subscription\" > /etc/apt/sources.list.d/ceph-no-subscription.list"
 	fi
 
+	# set no-subscription
+	information "Set no-subscription"
+
+	if [ -f $FILE_NO_SUBSCRIPTION ]; then
+		information "Set no-subscription for the webinterface"
+		echo "
+Ext.define('Proxmox.node.Dashboard', {
+    override: 'Proxmox.node.Dashboard',
+    initComponent: function() {
+        var me = this;
+        me.callParent();
+        me.mon(Proxmox.Utils, 'authstatechange', me.authChange);
+        me.authChange(Proxmox.Utils.authOK);
+    }
+});" > $FILE_NO_SUBSCRIPTION
+		
+	fi
+
 	# update the repository
 	information "Update the repository"
 	command "apt update"
+
+
 }
 
 
@@ -175,8 +196,8 @@ function tasks() {
 		"delete-snapshot")
 			delete_snapshot
 			;;
-		"replace-enterprise-repo")
-			change_enterprise_to_community_edition
+		"no-enterprise")
+			no_enterprise
 			;;
 		*)
 			information "available tasks:\n${tasks[@]}"
