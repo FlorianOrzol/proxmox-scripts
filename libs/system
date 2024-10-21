@@ -152,7 +152,7 @@ function no_enterprise() {
 	# set no-subscription
 	information "Set no-subscription"
 
-	if [ -f $FILE_NO_SUBSCRIPTION ]; then
+	if [ ! -f $FILE_NO_SUBSCRIPTION ]; then
 		information "Set no-subscription for the webinterface"
 		echo "
 Ext.define('Proxmox.node.Dashboard', {
