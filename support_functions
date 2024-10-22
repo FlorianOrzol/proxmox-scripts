@@ -48,6 +48,17 @@ function warning {
 	waiting 2
 }
 
+
+function debug {
+	local debug=$1
+
+	set_font_color "darkgrey"
+	# print the debug
+	echo "$debug"
+	set_font_color "default"
+	waiting 1
+}
+
 function command {
     local command="$1"
 
@@ -65,6 +76,7 @@ function command {
     waiting 1
 
 }
+
 
 
 function waiting {

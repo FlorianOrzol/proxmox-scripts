@@ -223,6 +223,7 @@ function update_proxmox() {
 #
 function create_user(){
 	# create a new user
+	debug "Create a new user"	
 	section "Create a new user"
 	# enter the username
 	username=$(enter "Enter the username: ")
