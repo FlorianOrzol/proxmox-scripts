@@ -6,7 +6,7 @@
 function section {
     local section=$1
 
-    set_font_color "yellow" >&2
+    set_font_color "yellow"
     # print the section name
     echo "$section" >&2
     underline "$section" "=" >&2
@@ -41,9 +41,9 @@ function information {
 function warning {
 	local warning=$1
 
-	set_font_color "reddark"
+	set_font_color "reddark" >&2
 	# print the warning
-	echo "$warning"
+	echo "$warning" >&2
 	set_font_color "default"
 	waiting 2
 }
@@ -52,7 +52,7 @@ function warning {
 function debug {
 	local debug=$1
 
-	set_font_color "darkgrey"
+	set_font_color "darkgrey" 
 	# print the debug
 	echo "$debug"
 	set_font_color "default"
@@ -86,12 +86,12 @@ function waiting {
     set_font_color "darkgrey" 
     # set brackets for the waiting time, e.g. 5 seconds: [     ]
     echo -n "waiting ["
-    for i in $(seq 1 $waitingtime); do echo -n " "; done
+    for i in $(seq 1 $waitingtime); do echo -n " ">&2; done
     echo -n "]"
 
     # set the cursor back to the beginning of the line without deleting the brackets [.    ]
     set_cursor_back $(($waitingtime+1))
-
+€2
     # fill the brackets with a dot every second
     for i in $(seq 1 $waitingtime); do
         echo -n "."
@@ -107,7 +107,7 @@ function waiting {
 function underline {
     count=${#1}
     sign=$2
-    for i in $(seq 1 $count); do echo -n $sign; done
+    for i in $(seq 1 $count); do echo -n "$sign" >&2; done
     echo ""
 }
 
@@ -232,11 +232,11 @@ function enter_password {
 
 function set_cursor_back {
     go_back=$1
-    echo -en "\033[${go_back}D" 
+    echo -en "\033[${go_back}D" >&2
 }
 
 function delete_line {
-    echo -en "\033[2K\n"
+    echo -en "\033[2K\n" >&2
 }
 
 function set_font_color {
@@ -244,25 +244,27 @@ function set_font_color {
 
     case $color in
         lightgreen)
-            echo -en "\e[92m"
+            colorcode="\e[92m"
             ;;
         darkgrey)
-            echo -en "\e[90m"
+            colorcode="\e[90m"
             ;;
         yellow)
-            echo -en "\e[93m"
+            colorcode="\e[93m"
             ;;
         lightblue)
-            echo -en "\e[94m"
+            colorcode="\e[94m"
             ;;
 		reddark)
-			echo -en "\e[31m"
+			colorcode="\e[31m"
 			;;
         default)
-            echo -en "\e[0m"
+            colorcode="\e[0m"
             ;;
         *)
-            echo -en "\e[0m"
+            colorcode="\e[0m"
             ;;
     esac
+
+	echo -en "$colorcode" >&2
 }
