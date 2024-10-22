@@ -52,7 +52,7 @@ function tasks() {
 			command "git pull"
 			;;
 		*)
-			echo "{${options[@]}}"
+			echo -e "Available tasks:\n${options[@]}"
 			;;
 	esac
 
