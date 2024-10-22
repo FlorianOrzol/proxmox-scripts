@@ -38,6 +38,15 @@ if [  -z $1 ]; then
 	exit
 fi
 
+# if file does not exist, exit
+if [ ! -f $dirRoot/libs/$1 ]; then
+	warning "File $1 does not exist"
+	echo "Available options:"
+	# list all files in libs directory
+	ls $dirRoot/libs
+	exit
+fi
+
 
 
 source $dirRoot/libs/$1
