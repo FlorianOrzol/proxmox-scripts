@@ -35,7 +35,7 @@ fi
 if [ -z $1 ]; then
 	information "Available options:"
 	# list all files in libs directory
-	command "ls $dirRoot/libs"
+	ls $dirRoot/libs
 fi
 
 
@@ -47,4 +47,3 @@ if [ -z $2 ]; then
 else
 	tasks 
 fi
-tasks $2

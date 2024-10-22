@@ -40,6 +40,10 @@ fi
 function tasks() {
 	local task=$1
 
+	local options=(
+		"update"
+	)
+
 	#currentPath="$(pwd)"
 	case $task in
 		"update")
@@ -49,7 +53,7 @@ function tasks() {
 			command "git pull"
 			;;
 		*)
-			echo "No task found"
+			echo "{${options[@]}}"
 			;;
 	esac
 
