@@ -322,7 +322,7 @@ function no_enterprise() {
 function tasks() {
 	task=$1
 
-	tasks=("update" "rollback" "show-snapshots" "delete-snapshot" "no-enterprise" "create-user")
+	tasks=("update" "rollback" "show-snapshots" "delete-snapshot" "no-enterprise" "create-user" "set-locals")
 
 	case $task in
 		"update")
@@ -357,6 +357,9 @@ function tasks() {
 			;;
 		"create-user")
 			create_user
+			;;
+		"set-locals")
+			set_locals
 			;;
 		*)
 			echo -e  "available tasks:\n${tasks[@]}"
