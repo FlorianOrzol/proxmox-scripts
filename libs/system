@@ -226,7 +226,7 @@ function create_user(){
 	section "Create a new user"
 	debug "Create a new user"	
 	# enter the username
-	username=$(enter 'Enter the username: ')
+	username=$(enter \"Enter the username: \")
 	# check if the user already exists
 	if id $username &>/dev/null; then
 		information "The user $username already exists."
