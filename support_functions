@@ -157,14 +157,14 @@ function question_yn {
 function enter {
     textOrder=$1
 
-    set_font_color "lightgreen"
+    set_font_color "lightgreen" >&2
 
     echo -en "$textOrder" >&2
     read -r input1
 
-    set_font_color "default"
+    set_font_color "default" >&2
 
-    echo $input1
+    echo "$input1"
 }
 
 
