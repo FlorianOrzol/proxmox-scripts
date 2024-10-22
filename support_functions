@@ -210,18 +210,21 @@ function enter_password {
     while true; do
         echo -en "$textOrder" >&2
         read -r -s input1
-        echo -en "Repeat:" >&2
+        echo -en "\nRepeat:" >&2
         read -r -s input2
+		echo -e "\n"
 
         if [[ $input1 != $input2 ]]; then
 			set_font_color "reddark"
         	echo "Passwords do not match, please enter again" >&2
         else
-            break;
+			break;
         fi
     done
 
     set_font_color "default"
+
+	echo "$input1" >&2
 
     echo $input1
 }
