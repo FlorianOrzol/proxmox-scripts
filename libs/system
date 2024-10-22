@@ -238,7 +238,7 @@ function create_user(){
 	# enter the password
 	password=$(enter_password "Enter the password: ")
 	# create the user
-	command "useradd -m -s /bin/bash $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
+	command "useradd -m -s /bin/bash $username --gecos 'First Last,RoomNumber,WorkPhone,HomePhone' --disabled-password"
 	# set the password
 	command "echo \"$username:$password\" | chpasswd"
 }
