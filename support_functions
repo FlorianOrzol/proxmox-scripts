@@ -208,9 +208,9 @@ function enter_password {
     set_font_color "lightgreen"
 
     while true; do
-        echo -e "$textOrder"
+        echo -en "$textOrder" >&2
         read -r -s input1
-        echo -e "Repeat:"
+        echo -en "Repeat:" >&2
         read -r -s input2
 
         if [[ $input1 != $input2 ]]; then
