@@ -69,7 +69,7 @@ function command {
     echo -e "----OUTPUT-----------------------------------------"
     waiting 1
     set_font_color "default"
-    eval $command
+    eval "$command"
     set_font_color "lightblue"
     echo -e "\n---END---------------------------------------------\n"
     set_font_color "default"
