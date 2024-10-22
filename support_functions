@@ -159,7 +159,7 @@ function enter {
 
     set_font_color "lightgreen"
 
-    echo -e "$textOrder" >&2
+    echo -en "$textOrder" >&2
     read -r input1
 
     set_font_color "default"

@@ -232,7 +232,7 @@ function create_user(){
 		exit
 	fi
 	# enter the password
-	password=$(enter "Enter the password: ")
+	password=$(enter_password "Enter the password: ")
 	# create the user
 	command "useradd -m -s /bin/bash $username"
 	# set the password
