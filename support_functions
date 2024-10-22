@@ -214,7 +214,8 @@ function enter_password {
         read -r -s input2
 
         if [[ $input1 != $input2 ]]; then
-           information "Passwords do not match, please enter again"
+			set_font_color "reddark"
+        	echo "Passwords do not match, please enter again" >&2
         else
             break;
         fi
