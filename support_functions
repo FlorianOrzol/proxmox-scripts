@@ -6,7 +6,7 @@
 function section {
     local section=$1
 
-    set_font_color "yellow"
+    set_font_color "yellow" 
     # print the section name
     echo "$section" >&2
     underline "$section" "=" >&2
@@ -85,16 +85,16 @@ function waiting {
 
     set_font_color "darkgrey" 
     # set brackets for the waiting time, e.g. 5 seconds: [     ]
-    echo -n "waiting ["
-    for i in $(seq 1 $waitingtime); do echo -n " ">&2; done
-    echo -n "]"
+    echo -n "waiting [" >&2
+    for i in $(seq 1 $waitingtime); do echo -n " " >&2; done
+    echo -n "]" >&2
 
     # set the cursor back to the beginning of the line without deleting the brackets [.    ]
     set_cursor_back $(($waitingtime+1))
-€2
+
     # fill the brackets with a dot every second
     for i in $(seq 1 $waitingtime); do
-        echo -n "."
+        echo -n "." >&2
         sleep 1
     done
 
@@ -107,7 +107,7 @@ function waiting {
 function underline {
     count=${#1}
     sign=$2
-    for i in $(seq 1 $count); do echo -n "$sign" >&2; done
+    for i in $(seq 1 $count); do echo -n $sign; done
     echo ""
 }
 
