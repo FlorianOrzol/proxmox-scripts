@@ -258,7 +258,7 @@ function create_user(){
 	# create the user
 	command "adduser $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
 	# set the password
-	command "echo -n \"$username\:$password\" | chpasswd"
+	echo "$username:$password" | chpasswd
 }
 
 
