@@ -243,6 +243,7 @@ function create_user(){
 	section "Create a new user"
 	# enter the username
 	username=$(enter "Enter the username: ")
+	echo "$username ende"
 	# check if the user already exists
 	if id $username &>/dev/null; then
 		information "The user $username already exists."
@@ -257,7 +258,7 @@ function create_user(){
 	# create the user
 	command "adduser $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
 	# set the password
-	command "echo -n \"$username:$password\" | chpasswd"
+	command "echo -n \"$username\:$password\" | chpasswd"
 }
 
 
