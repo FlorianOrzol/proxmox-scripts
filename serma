@@ -24,12 +24,27 @@ source $dirRoot/private_data
 
 PN="serma"
 
+# check if symlink exists
 if [ ! -f /usr/bin/serma ]; then
 	information "Create symlink to /usr/bin"
 	command "ln -s $dirRoot/$PN /usr/bin/$PN"
 fi
 
 
+# if $1 is empty, show options
+if [ -z $1 ]; then
+	information "Available options:"
+	# list all files in libs directory
+	command "ls $dirRoot/libs"
+fi
+
+
+
 
 source $dirRoot/libs/$1
+if [ -z $2 ]; then
+	tasks $2
+else
+	tasks 
+fi
 tasks $2

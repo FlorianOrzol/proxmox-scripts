@@ -16,36 +16,32 @@
 # >>>> START SCRIPT <<<< #
 #
 
-function check_git_repo() {
-	if [ -f $GIT_REPO ]; then
-		real_tasks git-connection
-	fi
-}
+if [ -f $GIT_REPO ]; then
+	section "Enter git-repo credentials"
+
+	# enter git-repo url until it is valid
+	while true; do
+		GIT_REPO=$(enter "Please enter git-repo url: ") 
+		command "git ls-remote $GIT_REPO"
+		if [ $? -ne 0 ]; then
+			warning "Please enter a valid git-repo url"
+		else
+			break
+		fi
+	done
+	# set git-repo url as private data
+	information "Set GIT_REPO in $PATH_PRIVATE_DATA"
+	set_private_data "GIT_REPO" $GIT_REPO
+	;;
+fi
 	
 
 
-function real_tasks() {
+function tasks() {
 	local task=$1
 
 	#currentPath="$(pwd)"
 	case $task in
-		"git-connection")
-			section "Enter git-repo credentials"
-
-			# enter git-repo url until it is valid
-			while true; do
-				GIT_REPO=$(enter "Please enter git-repo url: ") 
-				command "git ls-remote $GIT_REPO"
-				if [ $? -ne 0 ]; then
-					warning "Please enter a valid git-repo url"
-				else
-					break
-				fi
-			done
-			# set git-repo url as private data
-			information "Set GIT_REPO in $PATH_PRIVATE_DATA"
-			set_private_data "GIT_REPO" $GIT_REPO
-			;;
 		"update")
 			section "Update scripts from git-repo"
 			# update scripts with user data from private_data file to dirRoot
@@ -54,16 +50,10 @@ function real_tasks() {
 			;;
 		*)
 			echo "No task found"
-;;
+			;;
 	esac
 
 	#command "cd $currentPath"
 			
 }
 
-function tasks() {
-	local task=$1
-
-	check_git_repo $task
-	real_tasks $task
-}
