@@ -30,9 +30,7 @@ if [ ! -f /usr/bin/serma ]; then
 	command "ln -s $dirRoot/$PN /usr/bin/$PN"
 fi
 
-echo "debug: 1: $1"
 # if $1 is empty, show options
-
 if [  -z $1 ]; then
 	echo "Available options:"
 	# list all files in libs directory
@@ -43,6 +41,7 @@ fi
 
 
 source $dirRoot/libs/$1
+# if $2 is empty, call the function without parameter
 if [ -z $2 ]; then
 	tasks 
 else

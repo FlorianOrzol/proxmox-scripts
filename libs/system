@@ -24,6 +24,12 @@ FILE_NO_SUBSCRIPTION="/etc/apt/apt.conf.d/pve-no-subscription-message"
 
 
 
+# ==============================
+# ZFS
+# ==============================
+#
+#
+#
 # show available snapshots only for rpool
 function show_snapshots() {
 	information "Available snapshots:"
@@ -108,19 +114,6 @@ function create_snapshot_savepoint() {
 
 
 
-function update_proxmox() {
-	# update Proxmox VE
-	section "Update Proxmox VE"
-	command "apt update && apt dist-upgrade -y"
-}
-
-
-
-
-
-
-
-
 function check_today() {
 	# check if the update was already done today
 	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
@@ -129,7 +122,6 @@ function check_today() {
 		exit
 	fi
 }
-
 
 
 
@@ -207,6 +199,52 @@ function rollback_last_update() {
 
 
 
+function update_proxmox() {
+	# update Proxmox VE
+	section "Update Proxmox VE"
+	command "apt update && apt dist-upgrade -y"
+}
+
+
+
+
+
+
+
+
+
+# ==============================
+# OS specific
+# ==============================
+#
+#
+#
+#
+#
+function create_user(){
+	# create a new user
+	section "Create a new user"
+	# enter the username
+	username=$(enter "Enter the username: ")
+	# check if the user already exists
+	if id $username &>/dev/null; then
+		information "The user $username already exists."
+		exit
+	fi
+	# enter the password
+	password=$(enter "Enter the password: ")
+	# create the user
+	command "useradd -m -s /bin/bash $username"
+	# set the password
+	command "echo \"$username:$password\" | chpasswd"
+}
+
+
+
+
+
+
+
 
 function no_enterprise() {
 	section "Change Enterprise to Community Edition"
@@ -254,7 +292,7 @@ function no_enterprise() {
 function tasks() {
 	task=$1
 
-	tasks=("update" "rollback" "show-snapshots" "delete-snapshot" "no-enterprise")
+	tasks=("update" "rollback" "show-snapshots" "delete-snapshot" "no-enterprise" "create-user")
 
 	case $task in
 		"update")
@@ -286,6 +324,9 @@ function tasks() {
 			;;
 		"no-enterprise")
 			no_enterprise
+			;;
+		"create-user")
+			create_user
 			;;
 		*)
 			information "available tasks:\n${tasks[@]}"
