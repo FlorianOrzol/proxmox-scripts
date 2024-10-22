@@ -329,7 +329,7 @@ function tasks() {
 			create_user
 			;;
 		*)
-			information "available tasks:\n${tasks[@]}"
+			echo -e  "available tasks:\n${tasks[@]}"
 			exit
 			;;
 	esac
