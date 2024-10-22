@@ -34,19 +34,17 @@ echo "debug: 1: $1"
 # if $1 is empty, show options
 
 if [  -z $1 ]; then
-	information "Available options:"
+	echo "Available options:"
 	# list all files in libs directory
 	ls $dirRoot/libs
 	exit
 fi
 
 
-echo "debug: 2: $1"
-echo "debug: 3: $2"
 
 source $dirRoot/libs/$1
 if [ -z $2 ]; then
-	tasks $2
-else
 	tasks 
+else
+	tasks $2
 fi
