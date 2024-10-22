@@ -221,6 +221,32 @@ function update_proxmox() {
 #
 #
 #
+
+
+
+
+
+
+
+
+
+function set_locals() {
+	# set the locals
+	section "Set the locals"
+	# set the locals
+	command "sed -i 's/# de_DE.UTF-8 UTF-8/de_DE.UTF-8 UTF-8/g' /etc/locale.gen"
+	command "locale-gen"
+	command "update-locale LANG=de_DE.UTF-8"
+}
+
+
+
+
+
+
+
+
+
 function create_user(){
 	# create a new user
 	section "Create a new user"
