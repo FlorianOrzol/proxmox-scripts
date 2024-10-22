@@ -30,7 +30,7 @@ if [ ! -f /usr/bin/serma ]; then
 	command "ln -s $dirRoot/$PN /usr/bin/$PN"
 fi
 
-
+echo "debug: 1: $1"
 # if $1 is empty, show options
 if [ ! -z $1 ]; then
 	information "Available options:"
@@ -40,7 +40,8 @@ if [ ! -z $1 ]; then
 fi
 
 
-
+echo "debug: 2: $1"
+echo "debug: 3: $2"
 
 source $dirRoot/libs/$1
 if [ -z $2 ]; then
