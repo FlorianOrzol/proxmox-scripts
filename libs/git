@@ -66,5 +66,4 @@ function tasks() {
 
 	check_git_repo $task
 	real_tasks $task
-
-
+}
