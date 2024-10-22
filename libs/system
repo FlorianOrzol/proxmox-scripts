@@ -229,12 +229,16 @@ function create_user(){
 	# check if the user already exists
 	if id $username &>/dev/null; then
 		information "The user $username already exists."
-		exit
+		question_yn "Do you want to delete the user?" N
+		if [[ $? -eq 1 ]]; then
+			exit
+		fi
+		command "userdel -r $username"
 	fi
 	# enter the password
 	password=$(enter_password "Enter the password: ")
 	# create the user
-	command "useradd -m -s /bin/bash $username"
+	command "useradd -m -s /bin/bash $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
 	# set the password
 	command "echo \"$username:$password\" | chpasswd"
 }
