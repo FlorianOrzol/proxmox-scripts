@@ -17,7 +17,7 @@
 #
 
 ZFS_ROOT_POOL="rpool/ROOT/pve-1"
-UPDATE_NAME="$(date +%Y-%m-%d)proxmox-before-update"
+UPDATE_NAME="$(date +%Y-%m-%d)-proxmox-before-update"
 FILE_NO_SUBSCRIPTION="/etc/apt/apt.conf.d/pve-no-subscription-message" 
 
 
@@ -41,7 +41,7 @@ function show_snapshots() {
 
 
 
-function cleanup_snapshots() {
+function cleanup_update_snapshots() {
 	section "Cleanup snapshots"
 	# if there are more than 3 snapshots, delete all except the last 3
 	information "Check if there are more than 3 snapshots"
@@ -50,7 +50,7 @@ function cleanup_snapshots() {
 		exit
 	fi
 	information "Delete all snapshots except the last 3"
-	command "zfs list -t snapshot -r $ZFS_ROOT_POOL | grep -v 'savepoint' | tail -n +4 | awk '{print \$1}' | xargs -n 1 zfs destroy"
+	command "zfs list -t snapshot -r $ZFS_ROOT_POOL | grep  'before-update' | tail -n +4 | awk '{print \$1}' | xargs -n 1 zfs destroy"
 }
 
 
@@ -63,48 +63,27 @@ function cleanup_snapshots() {
 
 
 function create_snapshot() {
+	local snapname=$1
+
+
 	# create a zfs snapshot. named "date(YYYY-MM-DD)-proxmox-update"
 	section "Create a snapshot"
 
+
 	# check if the snapshot already exists
-	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
-		information "The snapshot $UPDATE_NAME already exists."
+	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $snapname; then
+		information "The snapshot $snapname already exists."
 		information "If you want to update Proxmox VE again, delete the snapshot first."
 		question_yn "Do you want to delete the snapshot?" N
 		if [[ $? -eq 0 ]]; then
-			delete_snapshot
+			snapshot_delete_update
 		else
 			exit
 		fi
 	fi
-	command "zfs snapshot $ZFS_ROOT_POOL@$UPDATE_NAME"
+	command "zfs snapshot $ZFS_ROOT_POOL@$snapname"
 }
 
-
-
-
-
-
-
-
-
-function create_snapshot_savepoint() {
-	# create a zfs snapshot. named "date(YYYY-MM-DD)-proxmox-savepoint"
-	section "Create a savepoint snapshot"
-
-	# check if the snapshot already exists
-	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
-		information "The snapshot $UPDATE_NAME already exists."
-		information "If you want to update Proxmox VE again, delete the snapshot first."
-		question_yn "Do you want to delete the snapshot?" N
-		if [[ $? -eq 0 ]]; then
-			delete_snapshot
-		else
-			exit
-		fi
-	fi
-	command "zfs snapshot $ZFS_ROOT_POOL@$UPDATE_NAME"
-}
 
 
 
@@ -127,13 +106,30 @@ function check_today() {
 
 
 
+function snapshot_delete() {
 
-
-
-
-function delete_snapshot() {
 	# delete the snapshot
 	section "Delete the snapshot"
+
+	# list all snapshots with numbers
+	zfs list -t snapshot -r $ZFS_ROOT_POOL | awk '{print NR, $1}'
+	# choose the snapshot to delete
+	number=$(enter "Enter the number of the snapshot you want to delete: ")
+	# get the snapshot name
+	snapname=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | awk '{print NR, $1}' | grep $number | awk '{print $2}')
+	# delete the snapshot
+	question_yn "Are you sure you want to delete the snapshot?" N
+	if [[ $? -eq 0 ]]; then
+		command "zfs destroy $snapname"
+	fi
+}
+
+
+
+
+
+function snapshot_delete_update() {
+
 	# check if the snapshot exists
 	if ! zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
 		information "The last snapshot is not from today."
@@ -171,20 +167,10 @@ function rollback_last_update() {
 		command "zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $ZFS_ROOT_POOL | tail -n 1"
 		information "All steps of the last update will be undone."
 		question_yn "Are you sure you want to rollback to the last update?" N
-		question "Are you sure you want to rollback to the last update?"
 		if [[ $? -eq 1 ]]; then
 			exit
 		fi
 	fi
-
-
-
-
-
-
-
-
-
 
 	beforeLastUpdate=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME | tail -n 1 | awk '{print $1}')
 	# rollback to the last snapshot
@@ -319,9 +305,9 @@ function tasks() {
 
 	case $task in
 		"update")
-			create_snapshot
+			create_snapshot $UPDATE_NAME
 			update_proxmox
-			cleanup_snapshots
+			cleanup_update_snapshots
 			show_snapshots
 			;;
 		"rollback")
@@ -340,13 +326,13 @@ function tasks() {
 			command "zfs rollback $snapshot"
 			;;
 		"create-snapshot-savepoint")
-			create_snapshot_savepoint
+			create_snapshot $(date +%Y-%m-%d)-proxmox-savepoint 
 			;;
 		"show-snapshots")
 			show_snapshots
 			;;
 		"delete-snapshot")
-			delete_snapshot
+			snapshot_delete
 			;;
 		"no-enterprise")
 			no_enterprise
