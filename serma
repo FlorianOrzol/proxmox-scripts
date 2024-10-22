@@ -32,7 +32,8 @@ fi
 
 echo "debug: 1: $1"
 # if $1 is empty, show options
-if [[ ! -z $1 ]]; then
+
+if [  -z $1 ]; then
 	information "Available options:"
 	# list all files in libs directory
 	ls $dirRoot/libs
