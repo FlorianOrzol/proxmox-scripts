@@ -6,11 +6,11 @@
 function section {
     local section=$1
 
-    set_font_color "yellow"
+    set_font_color "yellow" >&2
     # print the section name
-    echo "$section"
-    underline "$section" "="
-    set_font_color "default"
+    echo "$section" >&2
+    underline "$section" "=" >&2
+    set_font_color "default" >&2
     waiting 1
 }
 
@@ -19,10 +19,10 @@ function section {
 function subsection {
     local subsection=$1
 
-    set_font_color "yellow"
+    set_font_color "yellow" >&2
     # print the subsection name
-    echo "$subsection"
-    set_font_color "default"
+    echo "$subsection" >&2
+    set_font_color "default" >&2
     waiting 1
 
 }
@@ -31,10 +31,10 @@ function subsection {
 function information {
     local information=$1
 
-    set_font_color "lightgreen"
+    set_font_color "lightgreen" >&2
     # print the information
-    echo "$information"
-    set_font_color "default"
+    echo "$information" >&2
+    set_font_color "default" >&2
     waiting 1
 }
 
