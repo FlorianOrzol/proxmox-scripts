@@ -205,7 +205,7 @@ function enter_and_confirm {
 function enter_password {
     textOrder=$1
 
-    set_font_color "lightgreen"
+    set_font_color "lightgreen" >&2
 
     while true; do
         echo -en "$textOrder" >&2
@@ -215,8 +215,8 @@ function enter_password {
 		echo -e "\n"
 
         if [[ $input1 != $input2 ]]; then
-			set_font_color "reddark"
-        	echo "Passwords do not match, please enter again" >&2
+			set_font_color "reddark" >&2
+        	echo -e "\nPasswords do not match, please enter again" >&2
         else
 			break;
         fi
