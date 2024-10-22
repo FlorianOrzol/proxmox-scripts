@@ -36,6 +36,7 @@ if [ ! -z $1 ]; then
 	information "Available options:"
 	# list all files in libs directory
 	ls $dirRoot/libs
+	exit
 fi
 
 
