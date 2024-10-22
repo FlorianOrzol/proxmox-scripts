@@ -11,7 +11,7 @@ function section {
     echo "$section"
     underline "$section" "="
     set_font_color "default"
-    waiting 2
+    waiting 1
 }
 
 
@@ -23,7 +23,7 @@ function subsection {
     # print the subsection name
     echo "$subsection"
     set_font_color "default"
-    waiting 2
+    waiting 1
 
 }
 
@@ -35,7 +35,7 @@ function information {
     # print the information
     echo "$information"
     set_font_color "default"
-    waiting 2
+    waiting 1
 }
 
 function warning {
@@ -56,7 +56,7 @@ function command {
     echo "-> $command"
     set_font_color "lightblue"
     echo -e "----OUTPUT-----------------------------------------"
-    waiting 2
+    waiting 1
     set_font_color "default"
     eval $command
     set_font_color "lightblue"
