@@ -16,15 +16,15 @@
 # >>>> START SCRIPT <<<< #
 #
 
-
-if [ -f $GIT_REPO ]; then
-	tasks git-connection
-	tasks $1
-fi
+function check_git_repo() {
+	if [ -f $GIT_REPO ]; then
+		real_tasks git-connection
+	fi
+}
 	
 
 
-function tasks() {
+function real_tasks() {
 	task=$1
 
 	#currentPath="$(pwd)"
@@ -60,4 +60,11 @@ function tasks() {
 	#command "cd $currentPath"
 			
 }
+
+function tasks() {
+	task=$1
+
+	check_git_repo $task
+	real_tasks $task
+
 

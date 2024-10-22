@@ -26,7 +26,7 @@ PN="serma"
 
 if [ ! -f /usr/bin/serma ]; then
 	information "Create symlink to /usr/bin"
-	command "ln -s $dirRoot/$PN.sh /usr/bin/$PN"
+	command "ln -s $dirRoot/$PN /usr/bin/$PN"
 fi
 
 
