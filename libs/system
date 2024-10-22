@@ -221,15 +221,6 @@ function update_proxmox() {
 #
 #
 #
-
-
-
-
-
-
-
-
-
 function set_locals() {
 	# set the locals
 	section "Set the locals"
@@ -266,7 +257,7 @@ function create_user(){
 	# create the user
 	command "adduser $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
 	# set the password
-	command "echo \"$username:$password\" | chpasswd"
+	command "echo -n \"$username:$password\" | chpasswd"
 }
 
 
