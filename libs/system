@@ -44,7 +44,7 @@ function cleanup_snapshots() {
 		exit
 	fi
 	information "Delete all snapshots except the last 3"
-	command "zfs list -t snapshot -r $ZFS_ROOT_POOL | tail -n +4 | awk '{print \$1}' | xargs -n 1 zfs destroy"
+	command "zfs list -t snapshot -r $ZFS_ROOT_POOL | grep -v 'savepoint' | tail -n +4 | awk '{print \$1}' | xargs -n 1 zfs destroy"
 }
 
 
@@ -59,6 +59,32 @@ function cleanup_snapshots() {
 function create_snapshot() {
 	# create a zfs snapshot. named "date(YYYY-MM-DD)-proxmox-update"
 	section "Create a snapshot"
+
+	# check if the snapshot already exists
+	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
+		information "The snapshot $UPDATE_NAME already exists."
+		information "If you want to update Proxmox VE again, delete the snapshot first."
+		question_yn "Do you want to delete the snapshot?" N
+		if [[ $? -eq 0 ]]; then
+			delete_snapshot
+		else
+			exit
+		fi
+	fi
+	command "zfs snapshot $ZFS_ROOT_POOL@$UPDATE_NAME"
+}
+
+
+
+
+
+
+
+
+
+function create_snapshot_savepoint() {
+	# create a zfs snapshot. named "date(YYYY-MM-DD)-proxmox-savepoint"
+	section "Create a savepoint snapshot"
 
 	# check if the snapshot already exists
 	if zfs list -t snapshot -r $ZFS_ROOT_POOL | grep $UPDATE_NAME; then
@@ -228,6 +254,8 @@ function no_enterprise() {
 function tasks() {
 	task=$1
 
+	tasks=("update" "rollback" "show-snapshots" "delete-snapshot" "no-enterprise")
+
 	case $task in
 		"update")
 			create_snapshot
@@ -236,7 +264,19 @@ function tasks() {
 			show_snapshots
 			;;
 		"rollback")
-			rollback_last_update
+			# list all snapshots with numbers
+			zfs list -t snapshot -r $ZFS_ROOT_POOL | awk '{print NR, $1}'
+			# choose the snapshot to rollback
+			number=$(enter "Enter the number of the snapshot you want to rollback: ")
+			# get the snapshot name
+			snapshot=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | awk '{print NR, $1}' | grep $number | awk '{print $2}')
+			# rollback to the snapshot
+			information "All steps of the last update will be undone."
+			question_yn "Are you sure you want to rollback to the last update?" N
+			if [[ $? -eq 1 ]]; then
+				exit
+			fi
+			command "zfs rollback $snapshot"
 			;;
 		"show-snapshots")
 			show_snapshots
