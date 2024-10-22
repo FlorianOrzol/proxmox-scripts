@@ -32,7 +32,6 @@ if [ -f $GIT_REPO ]; then
 	# set git-repo url as private data
 	information "Set GIT_REPO in $PATH_PRIVATE_DATA"
 	set_private_data "GIT_REPO" $GIT_REPO
-	;;
 fi
 	
 
