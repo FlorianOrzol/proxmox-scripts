@@ -339,6 +339,9 @@ function tasks() {
 			fi
 			command "zfs rollback $snapshot"
 			;;
+		"create-snapshot-savepoint")
+			create_snapshot_savepoint
+			;;
 		"show-snapshots")
 			show_snapshots
 			;;
