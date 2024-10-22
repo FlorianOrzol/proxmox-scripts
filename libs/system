@@ -253,13 +253,13 @@ function create_user(){
 	fi
 
 	# add the user
-	adduser $username
+	#adduser $username
 #	# enter the password
-#	password=$(enter_password "Enter the password: ")
-#	# create the user
-#	command "adduser $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
+	password=$(enter_password "Enter the password: ")
+	# create the user
+	command "adduser $username --gecos \"First Last,RoomNumber,WorkPhone,HomePhone\" --disabled-password"
 #	# set the password
-#	eval "echo "$username:$password" | chpasswd
+	command "echo \"$username:$password\" | chpasswd"
 }
 
 
