@@ -65,6 +65,7 @@ function cleanup_update_snapshots() {
 function create_snapshot() {
 	local snapname=$1
 
+	snapname=$ZFS_ROOT_POOL@$snapname
 
 	# create a zfs snapshot. named "date(YYYY-MM-DD)-proxmox-update"
 	section "Create a snapshot"
@@ -80,7 +81,7 @@ function create_snapshot() {
 			exit
 		fi
 	fi
-	command "zfs snapshot $ZFS_ROOT_POOL@$snapname"
+	command "zfs snapshot $snapname"
 }
 
 
@@ -106,7 +107,7 @@ function check_today() {
 
 
 function snapshot_delete() {
-	local snapname=$1
+	local snapname="$1"
 
 	# delete the snapshot
 	section "Delete the snapshot"
