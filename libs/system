@@ -196,6 +196,7 @@ function rollback() {
 	number=$(enter "Enter the number of the snapshot you want to rollback: ")
 	# get the snapshot name
 	snapshot=$(zfs list -t snapshot -r $ZFS_ROOT_POOL | awk '{print NR, $1}' | grep $number | awk '{print $2}')
+	debug $snapshot
 	# rollback to the snapshot
 	information "All steps of the last update will be undone."
 	question_yn "Are you sure you want to rollback to the last update?" N

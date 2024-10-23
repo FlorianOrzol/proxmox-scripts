@@ -54,7 +54,7 @@ function debug {
 
 	set_font_color "darkgrey" 
 	# print the debug
-	echo "$debug" >&2
+	echo "debug: $debug" >&2
 	set_font_color "default"
 	waiting 1
 }
