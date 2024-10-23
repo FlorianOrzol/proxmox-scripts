@@ -20,9 +20,22 @@
 function ceph() {
 	section "Install Ceph"
 
-	# check if ceph is already installed 
-	if [ ! -f /etc/pve/ceph.conf ]; then
-		# install ceph
-		command "pveceph install"
-	fi
+	debug "try to call system show_snapshots"
+	source system
+	tasks show_snapshots
+}
+
+
+
+function tasks() {
+	task=$1
+	tasks=("ceph")
+	case $task in
+		"ceph")
+			ceph
+			;;
+		*)
+			information "Available tasks:\n${tasks[@]}"
+			;;
+	esac
 }
