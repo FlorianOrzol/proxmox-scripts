@@ -111,7 +111,7 @@ function snapshot_delete() {
 	# delete the snapshot
 	section "Delete the snapshot"
 
-	if [ -z $snapname ]; then
+	if [ ! -z $snapname ]; then
 		# list all snapshots
 		show_snapshots
 		question_yn "Do you want to delete $snapname?" N
