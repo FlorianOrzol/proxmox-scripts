@@ -50,7 +50,7 @@ function warning {
 
 
 function debug {
-	local debug=$1
+	local debug="$1"
 
 	set_font_color "darkgrey" 
 	# print the debug
