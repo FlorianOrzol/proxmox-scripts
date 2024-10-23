@@ -21,7 +21,7 @@ function ceph() {
 	section "Install Ceph"
 
 	debug "try to call system show_snapshots"
-	source system
+	source $dirRoot/libs/system
 	tasks show_snapshots
 }
 
