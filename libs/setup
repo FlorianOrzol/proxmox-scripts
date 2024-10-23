@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# 
+#  _____        _
+# |~>   |     ('v') 
+# /:::::\    /{w w}\ 
+#--------------------------------
+# Copyright Florian Orzol
+#
+# description: setup Proxmox VE
+# date: 2024-10-21
+# version: 1.0 
+#
+#    <')
+# \_;( )
+# >>>> START SCRIPT <<<< #
+#
+
+
+function ceph() {
+	section "Install Ceph"
+
+	# check if ceph is already installed 
+	if [ ! -f /etc/pve/ceph.conf ]; then
+		# install ceph
+		command "pveceph install"
+	fi
+}
